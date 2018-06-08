@@ -3,50 +3,101 @@ import dynamic
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import integrate
-from math import pi, atan2
+from math import pi, atan2, sqrt
 
 
 
-def dynlin(dX, dU, A, B):
+def dynlin(dX, time, dU, A, B):
     return np.dot(A, dX)+np.dot(B, dU)
+
+def mode(pole):
+    w0 = sqrt(pole.real**2 + pole.imag**2)
+    ksi = -pole.real/w0
+    return w0, ksi
+
+def state(PLANE, pt_trim):
+    PLANE.set_mass_and_static_margin(pt_trim[3], pt_trim[2])
+    params = {'va': dynamic.va_of_mach(pt_trim[1], pt_trim[0]), 'h': pt_trim[0], 'gamma': 0}
+    X, U = dynamic.trim(PLANE, params)
+    A, B = dynamic.ut.num_jacobian(X, U, PLANE, dynamic.dyn)
+    return X, U, A, B
+
 
 def main():
 
     PLANE = dynamic.Param_737_800()
     Wh = 2 #m/s vitesse vent
-    h = 10000
-    Ma = 0.9
-    ms = 0.5
-    km = 1
-    va = dynamic.va_of_mach(Ma, h)
-    pt_trim = [h, Ma, ms, km]
+    h1, h2 = 10000, 3000
+    Ma1, Ma2 = 0.9, 0.4
+    ms1, ms2 = 0.5, 0.5
+    km1, km2 = 1, 0.1
+    va = dynamic.va_of_mach(Ma1, h1)
+    pt_trim1 = [h1, Ma1, ms1, km1]
+    pt_trim2 = [h2, Ma2, ms2, km2]
 
-    PLANE.set_mass_and_static_margin(km, Ma)
-
-    def q1():
-        time = np.arange(0,240,0.1)
-        Xtrim, Utrim = dynamic.trim(PLANE, {'va':va, 'h':h})
-        add_wind = np.array([0, 0, 0, atan2(Wh, Xtrim[2]), 0, 0])
-        x=integrate.odeint(dynamic.dyn, Xtrim+add_wind, time, args=(Utrim, PLANE))
+    def compare_lin(T, pt_trim):
+        X, U, A, B = state(PLANE, pt_trim)
+        time = np.arange(0,T,0.1)
+        val_p = np.linalg.eigvals(A[2:, 2:])
+        add_wind = np.array([0, 0, 0, atan2(Wh, X[2]), 0, 0])
+        x=integrate.odeint(dynamic.dyn, X+add_wind, time, args=(U, PLANE))
         dynamic.plot(time, x)
         plt.show()
+        dU = np.zeros((4,))
+        dx = integrate.odeint(dynlin, add_wind, time, args=(dU, A, B))
+        out = np.array([dxi + X for dxi in dx])
+        for j, Xj in enumerate(out):
+            out[j][0] += out[j][2] * time[j]
+        dynamic.plot(time, out)
+        plt.show()
+        dynamic.plot(time, abs(out-x))
+        plt.show()
+        print(val_p)
+        print([mode(val_p[i]) for i in range(len(val_p))])
 
-    #q1()
-
-    def q1_lin():
-        time = np.arange(0, 240, 0.1)
-        params = {'va': dynamic.va_of_mach(Ma, h), 'h': h, 'gamma': 0}
-        X, U = dynamic.trim(PLANE, params)
-        A, B = dynamic.ut.num_jacobian(X, U, PLANE, dynamic.dyn)
-        #A_4 = A[2:, 2:]
-        #B_4 = B[2:, 2:]
-        dU = np.zeros((2,1))
+    def q3(T, pt_trim1, pt_trim2):
+        _, _, A, B = state(PLANE, pt_trim1)
+        X, U, _, _ = state(PLANE, pt_trim2)
         add_wind = np.array([0, 0, 0, atan2(Wh, X[2]), 0, 0])
-        dx=integrate.odeint(dynlin, add_wind, time, args=(dU, A, B))
-        dynamic.plot(time, dx)
+        time = np.arange(0,T,0.1)
+        x=integrate.odeint(dynamic.dyn, X+add_wind, time, args=(U, PLANE))
+        dynamic.plot(time, x)
+        plt.show()
+        dU = np.zeros((4,))
+        dx = integrate.odeint(dynlin, add_wind, time, args=(dU, A, B))
+        out = np.array([dxi + X for dxi in dx])
+        for j, Xj in enumerate(out):
+            out[j][0] += out[j][2] * time[j]
+        dynamic.plot(time, out)
+        plt.show()
+        dynamic.plot(time, abs(out-x))
         plt.show()
 
-    q1_lin()
+    def modal_form():
+        _, _, A, B = state(PLANE, pt_trim1)
+        A_4, B_4 = A[2:, 2:], B[2:, :2]
+        val_p, M = np.linalg.eig(A_4)
+        M_inv = np.linalg.inv(M)
+        Am_4 = np.diag(val_p)
+        Bm_4 = np.dot(M_inv, B_4)
+        return Am_4, Bm_4
+
+    def stability():
+        _, _, A, B = state(PLANE, pt_trim1)
+        return np.linalg.eig(A[2:, 2:])
+
+    def controllability():
+        _, _, A, B = state(PLANE, pt_trim1)
+        A_4, B_4 = A[2:, 2:], B[2:, :2]
+        
+
+
+
+    #compare_lin(240, pt_trim1)
+    #compare_lin(10, pt_trim1)
+    #q3(240, pt_trim1, pt_trim2)
+
+
 
 
 
