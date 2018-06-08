@@ -84,18 +84,54 @@ def main():
 
     def stability():
         _, _, A, B = state(PLANE, pt_trim1)
-        return np.linalg.eig(A[2:, 2:])
+        return np.linalg.eigvals(A[2:, 2:])
 
     def controllability():
         _, _, A, B = state(PLANE, pt_trim1)
         A_4, B_4 = A[2:, 2:], B[2:, :2]
-        
+        Q = np.zeros((4, 4*2))
+        for i in range(3):
+            Q[:,2*i:2*(i+1)] = np.dot(np.linalg.matrix_power(A_4, i),B_4)
+        return Q
+
+    def transfer_function():
+        _, _, A, B = state(PLANE, pt_trim1)
+        A_4, B_4 = A[2:, 2:], B[2:, :2][:, 0].reshape((4, 1))
+        C_4 = np.array([0,0,1,0])
+        Acc_4 = np.zeros((4,4))
+        Bcc_4 = np.array([[0],[0],[0],[1]])
+        val_p = np.linalg.eigvals(A_4)
+        coef = np.poly(val_p)
+        N=4
+        for i in range(3):
+            Acc_4[3,N-1-i]=-coef[i+1]
+            Acc_4[i, i+1]=1
+        Acc_4[3,0]=-coef[N]
+        Qccc = np.zeros((4, 4))
+        Q = np.zeros((4,4))
+        for i in range(4):
+            Qccc[:,i:i+1] = np.dot(np.linalg.matrix_power(Acc_4, i),Bcc_4)
+            Q[:,i:i+1] = np.dot(np.linalg.matrix_power(A_4, i),B_4)
+        Mcc = np.dot(Q, np.linalg.inv(Qccc))
+        Ccc_4 = np.dot(C_4, Mcc)
+        return Ccc_4, Acc_4[3,:]
+
+
+
+
+
+
 
 
 
     #compare_lin(240, pt_trim1)
     #compare_lin(10, pt_trim1)
     #q3(240, pt_trim1, pt_trim2)
+    #print(controllability())
+    print("numerateur = ", transfer_function()[0])
+    print("denominateur = ", -transfer_function()[1])
+    #print(stability())
+
 
 
 
