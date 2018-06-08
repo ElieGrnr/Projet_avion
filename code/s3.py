@@ -43,7 +43,7 @@ def state(PLANE, pt_trim):
     A, B = dynamic.ut.num_jacobian(X, U, PLANE, dynamic.dyn)
     return X, U, A, B
 
-def step(num, den, time):
+def step(num, den, time, label):
     """
     Draws output for a step input
     :param num: [a_n, a_n-1, ..., a_], numerator of transfer function
@@ -53,8 +53,22 @@ def step(num, den, time):
     """
     F = signal.TransferFunction(num, den)
     ts, yout = signal.step2(F, T=time)
-    plt.figure()
-    plt.plot(ts, yout)
+    plt.plot(ts, yout, label=label)
+
+def Bode(nums, dens, labels):
+    for i in range(len(nums)):
+        F = signal.TransferFunction(nums[i], dens[i])
+        w, mag, phase = signal.bode(F)
+        ax1 = plt.subplot(2,1,1)
+        ax1.semilogx(w, mag,label=labels[i])
+        plt.legend()
+        plt.xlabel("Pulse $\log\omega$")
+        plt.ylabel("$\left| H(\omega)\\right|$")
+        ax2 = plt.subplot(2, 1, 2)
+        ax2.semilogx(w, phase,label=labels[i])
+        plt.legend()
+        plt.xlabel("Pulse $\log\omega$")
+        plt.ylabel("$\phi(\omega)$")
 
 
 def main():
@@ -153,13 +167,37 @@ def main():
         den = list(-Acc_4[3,:])
         den.append(1.)
         den.reverse()
-        return num, den
+        return num, den, val_p
+
+    def Pade_reduction():
+        num, den, val_p = transfer_function()
+        p = num[-1]/den[-1]
+        q = (num[-2]-(num[-1]/den[-1])*den[-2])/den[-1]
+        poles = sorted(val_p, key=lambda x: abs(x))
+        pade_poles = poles[0:2]
+        den_pade = np.poly(pade_poles)
+        b_0 = den_pade[-1]*p
+        b_1 = q*den_pade[-1]+b_0*den_pade[-2]/den_pade[-1]
+        num_pade = [b_1, b_0]
+        return num_pade, den_pade
 
 
-    num, den = transfer_function()
-    step(num, den, np.arange(0, 240, 0.2))
+
+    num, den,_ = transfer_function()
+    num_pade, den_pade = Pade_reduction()
+    time = np.arange(0, 240, 0.2)
+    plt.figure()
+    step(num, den, time, "$F$")
+    step(num_pade, den_pade, time, "$F_r$")
+    plt.legend()
+    plt.xlabel("time ($s$)")
+    plt.ylabel("$\\theta$")
     plt.show()
 
+    plt.figure()
+    Bode([num_pade], [den_pade], ["$F_r$"] )
+    #Bode(num_pade, den_pade, "$F_r$")
+    plt.show()
 
 
 
@@ -173,8 +211,8 @@ def main():
     #compare_lin(10, pt_trim1)
     #q3(240, pt_trim1, pt_trim2)
     #print(controllability())
-    print("numerateur = ", transfer_function()[0])
-    print("denominateur = ", transfer_function()[1])
+    #print("numerateur = ", transfer_function()[0])
+    #print("denominateur = ", transfer_function()[1])
     #print(stability())
 
 
