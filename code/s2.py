@@ -158,6 +158,8 @@ def main():
                         liste_vp = np.linalg.eigvals(A_4)
                         for m, ev in enumerate(liste_vp):
                             vp[i][j][k][l][m] = ev
+        #print(A_4)
+        #print(np.linalg.eigvals(A_4))
         return vp
 
     #vp = val_propre()
@@ -221,7 +223,8 @@ def main():
     #print(get_Cl())
     #print(get_dth())
     #print(get_dPHR_alpha_num())
-    simu()
+    #simu()
+    val_propre()
 
     #plot_h()
     #"plot_km()
