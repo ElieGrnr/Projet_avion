@@ -3,30 +3,64 @@ import dynamic
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import integrate
+from scipy import signal
 from math import pi, atan2, sqrt
 
 
 
 def dynlin(dX, time, dU, A, B):
+    """
+    computes dX_dot
+    :param dX: state
+    :param time: array
+    :param dU: input
+    :param A: state matrix
+    :param B: input matrix
+    :return:
+    """
     return np.dot(A, dX)+np.dot(B, dU)
 
 def mode(pole):
+    """
+    computes pseudo pulse and damping coeff of pole
+    :param pole: cpx
+    :return: w0, ksi
+    """
     w0 = sqrt(pole.real**2 + pole.imag**2)
     ksi = -pole.real/w0
     return w0, ksi
 
 def state(PLANE, pt_trim):
+    """
+    Computes model of a trim condition
+    :param PLANE:
+    :param pt_trim: list of [h, Ma, ms, km]
+    :return:
+    """
     PLANE.set_mass_and_static_margin(pt_trim[3], pt_trim[2])
     params = {'va': dynamic.va_of_mach(pt_trim[1], pt_trim[0]), 'h': pt_trim[0], 'gamma': 0}
     X, U = dynamic.trim(PLANE, params)
     A, B = dynamic.ut.num_jacobian(X, U, PLANE, dynamic.dyn)
     return X, U, A, B
 
+def step(num, den, time):
+    """
+    Draws output for a step input
+    :param num: [a_n, a_n-1, ..., a_], numerator of transfer function
+    :param den: idem, denominator of transfer function
+    :param time:
+    :return:
+    """
+    F = signal.TransferFunction(num, den)
+    ts, yout = signal.step2(F, T=time)
+    plt.figure()
+    plt.plot(ts, yout)
+
 
 def main():
 
     PLANE = dynamic.Param_737_800()
-    Wh = 2 #m/s vitesse vent
+    Wh = 2 #m/s wind velocity
     h1, h2 = 10000, 3000
     Ma1, Ma2 = 0.9, 0.4
     ms1, ms2 = 0.5, 0.5
@@ -114,7 +148,18 @@ def main():
             Q[:,i:i+1] = np.dot(np.linalg.matrix_power(A_4, i),B_4)
         Mcc = np.dot(Q, np.linalg.inv(Qccc))
         Ccc_4 = np.dot(C_4, Mcc)
-        return Ccc_4, Acc_4[3,:]
+        num = list(Ccc_4)
+        num.reverse()
+        den = list(-Acc_4[3,:])
+        den.append(1.)
+        den.reverse()
+        return num, den
+
+
+    num, den = transfer_function()
+    step(num, den, np.arange(0, 240, 0.2))
+    plt.show()
+
 
 
 
@@ -129,7 +174,7 @@ def main():
     #q3(240, pt_trim1, pt_trim2)
     #print(controllability())
     print("numerateur = ", transfer_function()[0])
-    print("denominateur = ", -transfer_function()[1])
+    print("denominateur = ", transfer_function()[1])
     #print(stability())
 
 
