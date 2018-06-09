@@ -56,6 +56,13 @@ def step(num, den, time, label):
     plt.plot(ts, yout, label=label)
 
 def Bode(nums, dens, labels):
+    """
+    Draw Bode's diagram for transfert function num[i]/den[i]
+    :param nums:list of numerator (list)
+    :param dens: list of denominators (list)
+    :param labels: list of labels
+    :return: magnitude and phase diagrams
+    """
     for i in range(len(nums)):
         F = signal.TransferFunction(nums[i], dens[i])
         w, mag, phase = signal.bode(F)
@@ -100,7 +107,6 @@ def main():
         plt.show()
         dynamic.plot(time, abs(out-x))
         plt.show()
-        print(val_p)
         print([mode(val_p[i]) for i in range(len(val_p))])
 
     def q3(T, pt_trim1, pt_trim2):
@@ -121,8 +127,8 @@ def main():
         dynamic.plot(time, abs(out-x))
         plt.show()
 
-    def modal_form():
-        _, _, A, B = state(PLANE, pt_trim1)
+    def modal_form(pt_trim):
+        _, _, A, B = state(PLANE, pt_trim)
         A_4, B_4 = A[2:, 2:], B[2:, :2]
         val_p, M = np.linalg.eig(A_4)
         M_inv = np.linalg.inv(M)
@@ -130,20 +136,20 @@ def main():
         Bm_4 = np.dot(M_inv, B_4)
         return Am_4, Bm_4
 
-    def stability():
-        _, _, A, B = state(PLANE, pt_trim1)
+    def stability(pt_trim):
+        _, _, A, B = state(PLANE, pt_trim)
         return np.linalg.eigvals(A[2:, 2:])
 
-    def controllability():
-        _, _, A, B = state(PLANE, pt_trim1)
+    def controllability(pt_trim):
+        _, _, A, B = state(PLANE, pt_trim)
         A_4, B_4 = A[2:, 2:], B[2:, :2]
         Q = np.zeros((4, 4*2))
         for i in range(3):
             Q[:,2*i:2*(i+1)] = np.dot(np.linalg.matrix_power(A_4, i),B_4)
         return Q
 
-    def transfer_function():
-        _, _, A, B = state(PLANE, pt_trim1)
+    def transfer_function(pt_trim):
+        _, _, A, B = state(PLANE, pt_trim)
         A_4, B_4 = A[2:, 2:], B[2:, :2][:, 0].reshape((4, 1))
         C_4 = np.array([0,0,1,0])
         Acc_4 = np.zeros((4,4))
@@ -169,8 +175,8 @@ def main():
         den.reverse()
         return num, den, val_p
 
-    def Pade_reduction():
-        num, den, val_p = transfer_function()
+    def Pade_reduction(pt_trim):
+        num, den, val_p = transfer_function(pt_trim)
         p = num[-1]/den[-1]
         q = (num[-2]-(num[-1]/den[-1])*den[-2])/den[-1]
         poles = sorted(val_p, key=lambda x: abs(x))
@@ -183,8 +189,26 @@ def main():
 
 
 
-    num, den,_ = transfer_function()
-    num_pade, den_pade = Pade_reduction()
+    compare_lin(240, pt_trim1)
+    compare_lin(10, pt_trim1)
+    q3(240, pt_trim1, pt_trim2)
+
+    print("A_m = ", modal_form(pt_trim1)[0])
+    print("B_m = ", modal_form(pt_trim1)[1])
+
+    print("Les valeurs propres sont : ", stability(pt_trim1))
+
+    print("La matrice de commandabilité est Q= ", controllability(pt_trim1))
+
+    num, den, _ = transfer_function(pt_trim1)
+    print("Les coefficients de la fonction de transfert sont : ")
+    print("numérateur : ", num)
+    print("dénominateur : ", den)
+    num_pade, den_pade = Pade_reduction(pt_trim1)
+    print("Les coefficients de la fonction de transfert réduite sont : ")
+    print("numérateur : ", num_pade)
+    print("dénominateur : ", den_pade)
+
     time = np.arange(0, 240, 0.2)
     plt.figure()
     step(num, den, time, "$F$")
@@ -195,36 +219,9 @@ def main():
     plt.show()
 
     plt.figure()
-    Bode([num_pade], [den_pade], ["$F_r$"] )
-    #Bode(num_pade, den_pade, "$F_r$")
+    Bode([num, num_pade], [den, den_pade], ["$F$", "$F_r$"] )
+
     plt.show()
-
-
-
-
-
-
-
-
-
-    #compare_lin(240, pt_trim1)
-    #compare_lin(10, pt_trim1)
-    #q3(240, pt_trim1, pt_trim2)
-    #print(controllability())
-    #print("numerateur = ", transfer_function()[0])
-    #print("denominateur = ", transfer_function()[1])
-    #print(stability())
-
-
-
-
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
     main()
