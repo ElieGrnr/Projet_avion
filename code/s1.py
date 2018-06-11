@@ -7,7 +7,8 @@ def main():
 
     PLANE = dynamic.Param_737_800()
     Vt = PLANE.lt*PLANE.St/PLANE.cbar/PLANE.S
-    va = dynamic.va_of_mach(0.82, 0)
+    va = dynamic.va_of_mach(0.9, 0)
+    km = 1
 
     ###q1
 
@@ -24,8 +25,6 @@ def main():
         plt.title("$M_a\mapsto F$")
         plt.legend()
         plt.show()
-
-    #pousse_max([3000, 10000], [0.4, 0.9])
 
     ###q2
 
@@ -47,8 +46,6 @@ def main():
         plt.legend()
         plt.show()
 
-    #coeff_Cl([-10, 20], [-30, 20])
-
     ###q3
 
     def coeff_Cm(a, m_s):
@@ -57,7 +54,7 @@ def main():
         m_s_original = PLANE.ms
         plt.figure(2)
         for m in m_s:
-            PLANE.ms = m
+            PLANE.set_mass_and_static_margin(km, m)
             Cm = dynamic.get_aero_coefs(va, alpha*pi/180, 0, dphr, PLANE)[2]
             plt.plot(alpha, Cm, label="$m_s={}$".format(m))
         plt.xlabel("$\\alpha$")
@@ -65,10 +62,7 @@ def main():
         plt.title("$\\alpha \\mapsto C_m$")
         plt.legend()
         plt.show()
-        PLANE.ms = m_s_original
-
-    #coeff_Cm([-10, 20], [-0.1, 0, 0.2, 1])
-
+        PLANE.set_mass_and_static_margin(km, m_s_original)
 
     ###q4
 
@@ -87,7 +81,7 @@ def main():
         alpha0 = PLANE.a0*180/pi
         plt.figure(3)
         for m in m_s:
-            PLANE.ms = m
+            PLANE.set_mass_and_static_margin(km, m)
             dphre = (PLANE.Cm0 - PLANE.ms * PLANE.CLa * ((alpha - alpha0)*pi/180)) / (Vt * PLANE.CLat)
             plt.plot(alpha, dphre*180/pi, label='$m_s = {}$'.format(m))
         plt.xlabel('$\\alpha_e$')
@@ -96,7 +90,7 @@ def main():
         plt.legend()
         plt.show()
 
-        PLANE.ms = ms_original
+        PLANE.set_mass_and_static_margin(km, ms_original)
         plt.figure(4)
         for v in vt:
             dphre = (PLANE.Cm0 - PLANE.ms * PLANE.CLa * ((alpha - alpha0) * pi / 180)) / (v * PLANE.CLat)
@@ -107,8 +101,6 @@ def main():
         plt.legend()
         plt.show()
 
-    #dphre([-10, 20], [-0.1, 0, 0.2, 1], [0.9 * Vt, Vt, 1.1 * Vt])
-
     ### q5
 
     def coeff_CLe(a, m_s):
@@ -116,7 +108,7 @@ def main():
         alpha0 = PLANE.a0 * 180 / pi
         plt.figure(5)
         for m in m_s:
-            PLANE.ms = m
+            PLANE.set_mass_and_static_margin(km, m)
             dphre = (PLANE.Cm0 - PLANE.ms * PLANE.CLa * ((alpha - alpha0)*pi/180)) / (Vt * PLANE.CLat)
             CL = dynamic.get_aero_coefs(va, alpha*pi/180, 0, dphre, PLANE)[0]
             plt.plot(alpha, CL, label='$m_s={}$'.format(m))
@@ -127,8 +119,6 @@ def main():
         plt.show()
 
 
-    #coeff_CLe([-10, 20], [0.2, 1])
-
     ###q6
 
     def polaire(a, m_s):
@@ -136,7 +126,7 @@ def main():
         plt.figure(6)
         fmax = np.zeros(len(m_s))
         for i, m in enumerate(m_s):
-            PLANE.ms = m
+            PLANE.set_mass_and_static_margin(km, m)
             dphre = (PLANE.Cm0 - PLANE.ms * PLANE.CLa * (alpha*pi/180)) / (Vt * PLANE.CLat)
             CL, CD = dynamic.get_aero_coefs(va, alpha*pi/180, 0,dphre, PLANE)[0:2]
             plt.plot(CD, CL, label='$m_s={}$'.format(m))
@@ -148,18 +138,14 @@ def main():
         plt.show()
         return fmax
 
-    #polaire([-10, 20], [0.2, 1])
-    #print(polaire([-10, 20], [0.2, 1]))
-
-
     alpha = [-10, 20]
-    #pousse_max([3000, 10000], [0.4, 0.9])
-    #coeff_Cl(alpha, [-30, 20])
-    #coeff_Cm(alpha, [-0.1, 0, 0.2, 1])
-    dphre(alpha, [-0.1, 0, 0.5, 1], [0.9 * Vt, Vt, 1.1 * Vt])
-    #coeff_CLe(alpha, [0.5, 1])
-    #polaire(alpha, [0.5, 1])
-    #print(polaire(alpha, [0.2, 1]))
+    pousse_max([3000, 10000], [0.4, 0.9])
+    coeff_Cl(alpha, [-30, 20])
+    coeff_Cm(alpha, [-0.1, 0, 0.2, 1])
+    dphre(alpha, [-0.1, 0, 0.2, 1], [0.9 * Vt, Vt, 1.1 * Vt])
+    coeff_CLe(alpha, [0.2, 1])
+    polaire(alpha, [0.2, 1])
+    print(polaire(alpha, [0.2, 1]))
 
 if __name__ == "__main__":
     main()

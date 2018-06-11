@@ -94,7 +94,7 @@ def main():
 
     def get_Cl():
         Va = dynamic.va_of_mach(Ma[1],h[1])
-        #PLANE.set_mass_and_static_margin(km[1], ms[1])
+        PLANE.set_mass_and_static_margin(km[1], ms[1])
         rho = utils.isa(h[1])[1]
         Cl = (PLANE.m*PLANE.g)/(0.5*rho*PLANE.S*Va**2)
         return Cl
