@@ -138,7 +138,7 @@ def main():
         plt.show()
         return fmax
 
-    alpha = [-10, 20]
+    alpha = [-10, 50]
     pousse_max([3000, 10000], [0.4, 0.9])
     coeff_Cl(alpha, [-30, 20])
     coeff_Cm(alpha, [-0.1, 0, 0.2, 1])

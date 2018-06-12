@@ -139,8 +139,8 @@ def main():
         dynamic.plot(time, x)
         plt.show()
 
-    n = 10
-    def val_propre():
+
+    def val_propre(n):
         vp = np.zeros((n,n,n,n,4), dtype=complex)
         lh = np.linspace(h[0],h[1],n)
         lMa = np.linspace(Ma[0],Ma[1],n)
@@ -162,9 +162,8 @@ def main():
         #print(np.linalg.eigvals(A_4))
         return vp
 
-    #vp = val_propre()
 
-    def plot_h():
+    def plot_h(n,vp):
         for j, Ma_j in enumerate(Ma):
             for k, ms_k in enumerate(ms):
                 for l, km_l in enumerate(km):
@@ -177,7 +176,7 @@ def main():
                     decorate(vp_Va, vp_a, vp_theta, vp_q)
         plt.show()
 
-    def plot_Ma():
+    def plot_Ma(n, vp):
         for i, h_i in enumerate(h):
             for k, ms_k in enumerate(ms):
                 for l, km_l in enumerate(km):
@@ -190,7 +189,7 @@ def main():
                     decorate(vp_Va, vp_a, vp_theta, vp_q)
         plt.show()
 
-    def plot_ms():
+    def plot_ms(n, vp):
             for i, h_i in enumerate(h):
                 for j, Ma_j in enumerate(Ma):
                     for l, km_l in enumerate(km):
@@ -203,7 +202,7 @@ def main():
                         decorate(vp_Va, vp_a, vp_theta, vp_q)
             plt.show()
 
-    def plot_km():
+    def plot_km(n, vp):
             for i, h_i in enumerate(h):
                 for j, Ma_j in enumerate(Ma):
                     for k, ms_k in enumerate(ms):
@@ -217,19 +216,18 @@ def main():
             plt.show()
 
 
-    #q1()
-    #q2()
-    #PLANE.set_mass_and_static_margin(km[1], ms[1])
-    #print(get_Cl())
-    #print(get_dth())
-    #print(get_dPHR_alpha_num())
-    #simu()
-    val_propre()
-
-    #plot_h()
-    #"plot_km()
-    #plot_Ma()
-    #plot_ms()
+    q1()
+    q2()
+    print(get_Cl())
+    print(get_dth())
+    print(get_dPHR_alpha_num())
+    simu()
+    n = 10
+    vp = val_propre(n)
+    plot_h(n, vp)
+    plot_Ma(n, vp)
+    plot_ms(n, vp)
+    plot_km(n, vp)
 
 
 def decorate(vp_Va, vp_a, vp_theta, vp_q):
