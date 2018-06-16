@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from math import pi
 
+format = ".png"
+file = "image_s1/"
+
 def main():
 
     PLANE = dynamic.Param_737_800()
@@ -22,8 +25,9 @@ def main():
             plt.plot(M, F, label='$h={:.0f}$'.format(h_i))
         plt.xlabel("$M_a$")
         plt.ylabel("$F$")
-        plt.title("$M_a\mapsto F$")
+        plt.title("Evolution de la poussée maximale avec l'altitude et le nombre de Mach")
         plt.legend()
+        plt.savefig(file+"q1"+format)
         plt.show()
 
     ###q2
@@ -44,6 +48,7 @@ def main():
         plt.ylabel("$C_L$")
         plt.title("$\\alpha\\mapsto C_l$")
         plt.legend()
+        plt.savefig(file + "q2" + format)
         plt.show()
 
     ###q3
@@ -61,6 +66,7 @@ def main():
         plt.ylabel("$C_m$")
         plt.title("$\\alpha \\mapsto C_m$")
         plt.legend()
+        plt.savefig(file + "q3" + format)
         plt.show()
         PLANE.set_mass_and_static_margin(km, m_s_original)
 
@@ -88,6 +94,7 @@ def main():
         plt.ylabel('$\\delta_{{PHRe}}$')
         plt.title("$\\alpha \\mapsto \\delta_{{PHRe}}$")
         plt.legend()
+        plt.savefig(file + "q4_ms" + format)
         plt.show()
 
         PLANE.set_mass_and_static_margin(km, ms_original)
@@ -99,6 +106,7 @@ def main():
         plt.xlabel('$\\alpha_e$')
         plt.ylabel('$\\delta_{{PHRe}}$')
         plt.legend()
+        plt.savefig(file + "q4_Vt" + format)
         plt.show()
 
     ### q5
@@ -116,6 +124,7 @@ def main():
         plt.ylabel("$C_{L_e}$")
         plt.title('$\\alpha_e\\mapsto C_L$')
         plt.legend()
+        plt.savefig(file + "q5" + format)
         plt.show()
 
 
@@ -135,10 +144,11 @@ def main():
         plt.xlabel('$C_D$')
         plt.ylabel('$C_L$')
         plt.legend()
+        plt.savefig(file + "polaire" + format)
         plt.show()
         return fmax
 
-    alpha = [-10, 50]
+    alpha = [-10, 20]
     pousse_max([3000, 10000], [0.4, 0.9])
     coeff_Cl(alpha, [-30, 20])
     coeff_Cm(alpha, [-0.1, 0, 0.2, 1])

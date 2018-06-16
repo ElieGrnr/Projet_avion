@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from scipy import integrate
 from scipy import signal
 from math import pi, atan2, sqrt
+file = "image_s3/"
+format = ".png"
 
 
 
@@ -96,6 +98,7 @@ def main():
         add_wind = np.array([0, 0, 0, atan2(Wh, X[2]), 0, 0])
         x=integrate.odeint(dynamic.dyn, X+add_wind, time, args=(U, PLANE))
         dynamic.plot(time, x)
+        plt.savefig(file+"nolin"+str(T)+format)
         plt.show()
         dU = np.zeros((4,))
         dx = integrate.odeint(dynlin, add_wind, time, args=(dU, A, B))
@@ -103,8 +106,10 @@ def main():
         for j, Xj in enumerate(out):
             out[j][0] += out[j][2] * time[j]
         dynamic.plot(time, out)
+        plt.savefig(file + "lin" +str(T)+ format)
         plt.show()
         dynamic.plot(time, abs(out-x))
+        plt.savefig(file + "dif" +str(T)+ format)
         plt.show()
         print([mode(val_p[i]) for i in range(len(val_p))])
 
@@ -115,6 +120,7 @@ def main():
         time = np.arange(0,T,0.1)
         x=integrate.odeint(dynamic.dyn, X+add_wind, time, args=(U, PLANE))
         dynamic.plot(time, x)
+        plt.savefig(file + "otherpoint" + format)
         plt.show()
         dU = np.zeros((4,))
         dx = integrate.odeint(dynlin, add_wind, time, args=(dU, A, B))
@@ -122,8 +128,10 @@ def main():
         for j, Xj in enumerate(out):
             out[j][0] += out[j][2] * time[j]
         dynamic.plot(time, out)
+        plt.savefig(file + "badlin" + format)
         plt.show()
         dynamic.plot(time, abs(out-x))
+        plt.savefig(file + "badlindif" + format)
         plt.show()
 
     def modal_form(pt_trim):
@@ -140,11 +148,10 @@ def main():
         return np.linalg.eigvals(A[2:, 2:])
 
     def controllability(pt_trim):
-        _, _, A, B = state(PLANE, pt_trim)
-        A_4, B_4 = A[2:, 2:], B[2:, :2]
+        Am_4, Bm_4 = modal_form(pt_trim1)
         Q = np.zeros((4, 4*2))
         for i in range(3):
-            Q[:,2*i:2*(i+1)] = np.dot(np.linalg.matrix_power(A_4, i),B_4)
+            Q[:,2*i:2*(i+1)] = np.dot(np.linalg.matrix_power(Am_4, i),Bm_4)
         return Q
 
     def transfer_function(pt_trim):
@@ -212,14 +219,16 @@ def main():
     plt.figure()
     step(num, den, time, "$F$")
     step(num_pade, den_pade, time, "$F_r$")
+    plt.title("Réponse indicielle")
     plt.legend()
     plt.xlabel("time ($s$)")
     plt.ylabel("$\\theta$")
+    plt.savefig(file + "reponse_indicielle" + format)
     plt.show()
 
     plt.figure()
-    Bode([num, num_pade], [den, den_pade], ["$F$", "$F_r$"] )
-
+    Bode([num, num_pade], [den, den_pade], ["$F$", "$F_r$"])
+    plt.savefig(file + "Bode" + format)
     plt.show()
 
 if __name__ == "__main__":

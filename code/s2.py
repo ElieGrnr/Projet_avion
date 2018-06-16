@@ -5,6 +5,9 @@ import numpy as np
 from scipy import integrate
 from math import pi
 
+file = "image_s2/"
+format = ".png"
+
 def main():
 
     PLANE = dynamic.Param_737_800()
@@ -12,7 +15,7 @@ def main():
     h = [3000, 10000]
     Ma = [0.4,0.9]
     ms = [-0.2,0.5]
-    km = [0.1,0.9]
+    km = [0.1,1]
     va0 = dynamic.va_of_mach(Ma[0], 0)
     va1 =dynamic.va_of_mach(Ma[1], 0)
 
@@ -20,8 +23,8 @@ def main():
     def q1():
         lh = np.linspace(h[0], h[1], 100)
         n = len(lh)
-        for ms_i in ms:
-            for km_i in km:
+        for i, ms_i in enumerate(ms):
+            for j, km_i in enumerate(km):
                 PLANE.set_mass_and_static_margin(km_i, ms_i)
                 alpha0 = np.zeros(n)
                 dphr0 = np.zeros(n)
@@ -29,67 +32,78 @@ def main():
                 alpha1 = np.zeros(n)
                 dphr1 = np.zeros(n)
                 dth1 = np.zeros(n)
-                for i, h_i in enumerate(lh):
+                for k, h_i in enumerate(lh):
                     va0 = dynamic.va_of_mach(Ma[0], h_i)
                     va1 = dynamic.va_of_mach(Ma[1], h_i)
-                    alpha0[i] = dynamic.trim(PLANE, {'va':va0, 'h':h_i})[0][3]
-                    dphr0[i] = dynamic.trim(PLANE,{'va':va0, 'h':h_i})[1][0]
-                    dth0[i] = dynamic.trim(PLANE, {'va': va0, 'h': h_i})[1][1]
-                    alpha1[i] = dynamic.trim(PLANE, {'va': va1, 'h': h_i})[0][3]
-                    dphr1[i] = dynamic.trim(PLANE, {'va': va1, 'h': h_i})[1][0]
-                    dth1[i] = dynamic.trim(PLANE, {'va': va1, 'h': h_i})[1][1]
+                    alpha0[k] = dynamic.trim(PLANE, {'va':va0, 'h':h_i})[0][3]
+                    dphr0[k] = dynamic.trim(PLANE,{'va':va0, 'h':h_i})[1][0]
+                    dth0[k] = dynamic.trim(PLANE, {'va': va0, 'h': h_i})[1][1]
+                    alpha1[k] = dynamic.trim(PLANE, {'va': va1, 'h': h_i})[0][3]
+                    dphr1[k] = dynamic.trim(PLANE, {'va': va1, 'h': h_i})[1][0]
+                    dth1[k] = dynamic.trim(PLANE, {'va': va1, 'h': h_i})[1][1]
 
-                plt.figure()
-                plt.title("$m_s={}, k_m={}$".format(ms_i, km_i))
+                plt.figure("m_s={}, k_m={}".format(ms_i, km_i))
+                plt.subplot(1, 3, 1)
+                plt.title("$h \\mapsto \\alpha$")
+                #plt.title("$m_s={}, k_m={}$".format(ms_i, km_i))
                 plt.plot(lh, alpha0, label="$M_a=0.4$")
                 plt.plot(lh, alpha1, label="$M_a=0.9$")
                 plt.legend()
-                plt.xlabel("$h$")
-                plt.ylabel("$\\alpha$")
+                #plt.xlabel("$h$")
+                #plt.ylabel("$\\alpha$")
                 #plt.show()
 
-                plt.figure()
-                plt.title("$m_s={}, k_m={}$".format(ms_i, km_i))
+                #plt.figure()
+                plt.subplot(1, 3, 2)
+                #plt.title("$m_s={}, k_m={}$".format(ms_i, km_i))
+                plt.title("$h \\mapsto \\delta_{{th}}$")
                 plt.plot(lh, dth0, label="$M_a=0.4$")
                 plt.plot(lh, dth1, label="$M_a=0.9$")
-                plt.legend()
-                plt.xlabel("$h$")
-                plt.ylabel("$\\delta_{{th}}$")
+                #plt.legend()
+                #plt.xlabel("$h$")
+                #plt.ylabel("$\\delta_{{th}}$")
                 #plt.show()
 
-                plt.figure()
-                plt.title("$m_s={}, k_m={}$".format(ms_i, km_i))
+                #plt.figure()
+                plt.subplot(1, 3, 3)
+                #plt.title("$m_s={}, k_m={}$".format(ms_i, km_i))
+                plt.title("$h \\mapsto \\delta_{{PHR}}$")
                 plt.plot(lh, dphr0, label="$M_a=0.4$")
                 plt.plot(lh, dphr1, label="$M_a=0.9$")
-                plt.xlabel("$h$")
-                plt.ylabel("$\\delta_{{PHR}}$")
-                plt.legend()
+                #plt.xlabel("$h$")
+                #plt.ylabel("$\\delta_{{PHR}}$")
+                #plt.legend()
+                plt.tight_layout(.5)
+                plt.savefig(file + "q1_" + str(i) + str(j) + format)
                 #plt.show()
+
         plt.show()
 
 
     def q2():
         lm = np.linspace(Ma[0], Ma[1])
         n = len(lm)
-        for ms_i in ms:
-            for km_i in km:
+        for i, ms_i in enumerate(ms):
+            for j, km_i in enumerate(km):
                 PLANE.set_mass_and_static_margin(km_i, ms_i)
                 F0 = np.zeros(n)
                 F1 = np.zeros(n)
-                for i, m_i in enumerate(lm):
+                for k, m_i in enumerate(lm):
                     va0 = dynamic.va_of_mach(m_i, h[0])
                     va1 = dynamic.va_of_mach(m_i, h[1])
                     X0, U0 = dynamic.trim(PLANE, {'va':va0, 'h':h[0]})
                     X1, U1 = dynamic.trim(PLANE, {'va': va1, 'h': h[1]})
-                    F0[i] = dynamic.propulsion_model(X0, U0, PLANE)
-                    F1[i] = dynamic.propulsion_model(X1, U1, PLANE)
-                plt.figure()
+                    F0[k] = dynamic.propulsion_model(X0, U0, PLANE)
+                    F1[k] = dynamic.propulsion_model(X1, U1, PLANE)
+                plt.subplot(2,2,i+2*j+1)
                 plt.plot(lm, F0, label="$h={}$".format(h[0]))
                 plt.plot(lm, F1, label="$h={}$".format(h[1]))
                 plt.legend()
                 plt.title("$m_s={}, k_m={}$".format(ms_i, km_i))
                 plt.xlabel("$M_a$")
                 plt.ylabel("$F$")
+        plt.tight_layout(.5)
+        plt.savefig(file + "q2" + format)
         plt.show()
 
     def get_Cl():
@@ -109,7 +123,7 @@ def main():
         rho0 = utils.isa(h[1])[1]
         rho = utils.isa(h[1])[1]
         dth = F/(PLANE.F0*(rho/rho0)**(0.6)*(0.568+0.25*(1.2-Ma[1])**3))
-        return dth*180/pi
+        return dth
 
     def get_dPHR_alpha_num():
         St_over_S = PLANE.St/PLANE.S
@@ -135,8 +149,8 @@ def main():
         va = dynamic.va_of_mach(Ma[1],h[1])
         Xtrim, Utrim = dynamic.trim(PLANE, {'va':va, 'h':h[1]})
         x=integrate.odeint(dynamic.dyn, Xtrim, time, args=(Utrim, PLANE))
-        plt.figure()
         dynamic.plot(time, x)
+        plt.savefig(file+"simu"+format)
         plt.show()
 
 
@@ -167,61 +181,75 @@ def main():
         for j, Ma_j in enumerate(Ma):
             for k, ms_k in enumerate(ms):
                 for l, km_l in enumerate(km):
-                    vp_Va = vp[:,n*j-1,n*k-1,n*l-1,0]
-                    vp_a = vp[:,n*j-1,n*k-1,n*l-1,1]
-                    vp_theta = vp[:,n*j-1,n*k-1,n*l-1,2]
-                    vp_q = vp[:,n*j-1,n*k-1,n*l-1,3]
+                    vp_Va = vp[:,j*(n-1),k*(n-1),l*(n-1),0]
+                    vp_a = vp[:,j*(n-1),k*(n-1),l*(n-1),1]
+                    vp_theta = vp[:,j*(n-1),k*(n-1),l*(n-1),2]
+                    vp_q = vp[:,j*(n-1),k*(n-1),l*(n-1),3]
                     plt.figure()
                     plt.title("$M_a={}, m_s={}, k_m={}, h\in [{},{}]$".format(Ma_j, ms_k, km_l, h[0], h[1]))
                     decorate(vp_Va, vp_a, vp_theta, vp_q)
+                    if j==0 and k==1 and l==1:
+                        plt.savefig(file+"vp_h"+format)
         plt.show()
 
     def plot_Ma(n, vp):
         for i, h_i in enumerate(h):
             for k, ms_k in enumerate(ms):
                 for l, km_l in enumerate(km):
-                    vp_Va = vp[n*i-1,:,n*k-1,n*l-1,0]
-                    vp_a = vp[n*i-1,:,n*k-1,n*l-1,1]
-                    vp_theta = vp[n*i-1,:,n*k-1,n*l-1,2]
-                    vp_q = vp[n*i-1,:,n*k-1,n*l-1,3]
+                    vp_Va = vp[i*(n-1),:,k*(n-1),l*(n-1),0]
+                    vp_a = vp[i*(n-1),:,k*(n-1),l*(n-1),1]
+                    vp_theta = vp[i*(n-1),:,k*(n-1),l*(n-1),2]
+                    vp_q = vp[i*(n-1),:,k*(n-1),l*(n-1),3]
                     plt.figure()
                     plt.title("$h={}, m_s={}, k_m={}, M_a\in [{},{}]$".format(h_i, ms_k, km_l, Ma[0], Ma[1]))
                     decorate(vp_Va, vp_a, vp_theta, vp_q)
+                    if i==1 and k==1 and l==1:
+                        plt.savefig(file+"vp_Ma"+format)
         plt.show()
 
     def plot_ms(n, vp):
             for i, h_i in enumerate(h):
                 for j, Ma_j in enumerate(Ma):
                     for l, km_l in enumerate(km):
-                        vp_Va = vp[n*i-1,n*j-1,:,n*l-1,0]
-                        vp_a = vp[n*i-1,n*j-1,:,n*l-1,1]
-                        vp_theta = vp[n*i-1,n*j-1,:,n*l-1,2]
-                        vp_q = vp[n*i-1,n*j-1,:,n*l-1,3]
+                        vp_Va = vp[i*(n-1),j*(n-1),:,l*(n-1),0]
+                        vp_a = vp[i*(n-1),j*(n-1),:,l*(n-1),1]
+                        vp_theta = vp[i*(n-1),j*(n-1),:,l*(n-1),2]
+                        vp_q = vp[i*(n-1),j*(n-1),:,l*(n-1),3]
                         plt.figure()
                         plt.title("$h={}, M_a={}, k_m={}, m_s\in [{},{}]$".format(h_i, Ma_j, km_l, ms[0], ms[1]))
                         decorate(vp_Va, vp_a, vp_theta, vp_q)
+                        if i == 1 and j == 0 and l == 1:
+                            plt.savefig(file + "vp_ms" + format)
             plt.show()
 
     def plot_km(n, vp):
             for i, h_i in enumerate(h):
                 for j, Ma_j in enumerate(Ma):
                     for k, ms_k in enumerate(ms):
-                        vp_Va = vp[n*i-1,n*j-1,n*k-1,:,0]
-                        vp_a = vp[n*i-1,n*j-1,n*k-1,:,1]
-                        vp_theta = vp[n*i-1,n*j-1,n*k-1,:,2]
-                        vp_q = vp[n*i-1,n*j-1,n*k-1,:,3]
+                        vp_Va = vp[i*(n-1),j*(n-1),k*(n-1),:,0]
+                        vp_a = vp[i*(n-1),j*(n-1),k*(n-1),:,1]
+                        vp_theta = vp[i*(n-1),j*(n-1),k*(n-1),:,2]
+                        vp_q = vp[i*(n-1),j*(n-1),k*(n-1),:,3]
                         plt.figure()
                         plt.title("$h={}, M_a={}, m_s={}, k_m\in [{},{}]$".format(h_i, Ma_j, ms_k, km[0], km[1]))
                         decorate(vp_Va, vp_a, vp_theta, vp_q)
+                        if i == 1 and j == 0 and k == 1:
+                            plt.savefig(file + "vp_km" + format)
             plt.show()
 
 
-    q1()
-    q2()
-    print(get_Cl())
-    print(get_dth())
-    print(get_dPHR_alpha_num())
-    simu()
+    #q1()
+    #q2()
+    print("Au point de trim (h, Ma, ms, km)=(10000, 0.9, 0.5, 1), Cl = " + str(get_Cl()))
+    print("Lecture graphique")
+    print("Cd = 0.030 obtenu par lecture graphique à partir de la courbe polaire séance1")
+    print("alpha_eq = 3.66° : courbe q5 séance 1")
+    print("delat_PHR_eq = -8.77° : courbe q4 séance1")
+    print("on calcule dth : dth=" + str(get_dth()))
+    print("Calcul numérique : ")
+    print("dPHR = " + str(get_dPHR_alpha_num()[1]))
+    print("alpha = " + str(get_dPHR_alpha_num()[0]))
+    #simu()
     n = 10
     vp = val_propre(n)
     plot_h(n, vp)
