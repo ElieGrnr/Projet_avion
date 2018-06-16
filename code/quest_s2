@@ -1,0 +1,28 @@
+q1
+
+alpha en fonction de h : faut augmenter alpha qd h augmente pour avoir de la portance. Si mach augmente, moins de alpha nécessaire : cf formule de sustentation.
+Si km augmente, la masse augmente donc alpha plus grand pour conserver de la portance. 
+
+d_PHR en fonction de h: qd h augmente, lpha augmente donc dphr devient plus négatif pour contrer l'augmentation du moment  et maintenir l'avion a incidence constante (si stable donc ms > 0, sinon, dphr devient positif)
+
+dth en fonction de h:?
+
+modèle : delta_th peut être plus grand que 1. impossible en vrai. On peut pas voler a mach=0.9 à 3000m
+
+q3:
+Projeter l'équation de sustentation.
+vitesse obtenues par l'incidence : cf formule : si alpha augmente, Cl augmente, donc V diminue
+Utilisation des courbes de la seance 1 pour trouver (alpha_e, delta_e) en connaissant Cl. 
+On retrouve d_th grace a la formule de la Poussee et en utilisant la polaire equilibree. dth: F(poussée) = mg/f (f: finnesse provenant de la polaire) + formule 
+
+q4
+On retrouve les mêmes valeurs
+
+
+q5
+Utilistaion du jacobien pour obtenir A et B
+Modes rapide : modules grand oscilation d'incidence
+modes lents : modules petit phugoïde
+La croix c'est le début.
+Qd Ma augmente, la fugoïde est de plus lente
+

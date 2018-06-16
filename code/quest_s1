@@ -1,0 +1,27 @@
+q1
+F diminue avec h, pour tout Ma --> voler haut
+Densité de plus en plus faible
+
+q2
+modélisation : pas de décrochage, uniquement partie linéaire --> pas d'étude au-delà de 15°
+Différence de portance du à l'empennage arrière. Si dphr augmente, le "profil général" de l'avion est plus porteur donc Cl augmente.
+
+q3
+cf méca vol
+si avion stable (ms > 0), lorsque alpha augmente, Cm diminue (l'appareil pique)
+Interpretation (montrer sur maquette).
+
+q4
+dphr en fonction de alpha : même évolution que pour Cm
+
+dphr augment (revient à l'horizontal) qd Vt augmente.
+un empennage de volume plus faible a des effets aerodynamiques moins importants sur l'appareil. Il faut donc avoir des variations du phr plus importantes pour obtenir le mouvement souhaite (revenir a l'equilibre).
+
+q5 
+
+
+q6
+la polaire ne dépend pas de la marge statique.
+Voir finesse max sur code (et tracer tangente lors de la présentation)
+q = 0 car étude en tangage et comportement de l'avion à l'équilibre.
+

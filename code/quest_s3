@@ -1,0 +1,25 @@
+q1
+Les modèles linéaires et non linéaire ammène aux mêmes résultats : donc le modèle linéaire est pertinent pour étudier le comportement de l'avion autour de ce point de trim. Au fur et à mesure de la simulation, seule y se dévie du modèle non linéaire.
+
+On constate des oscillations de deux types :
+    à grande échelle (=oscillations lentes et peu amorties) : la fugoïde = échange entre énergie potentielle et énergie cinétique.
+    à petite échelle (=oscillations courtes et amorties) : oscillation d'incidence.
+On vérifie que les pseudo-périodes mesuées sont de même durée que la valeurs prédite avec les formules et las vp d la matrice.
+
+q2
+Les modèles linéaires et non linéaire ammène aux mêmes résultats : donc le modèle linéaire est pertinent pour étudier le comportement de l'avion autour de ce point de trim. Au fur et à mesure de la simulation, seule y se dévie du modèle non linéaire.
+
+q3
+Linéaire autour d'un point X0 pas pertinent autour d'un point X1. Les erreurs sont importantes.
+Le modèle linéaire n'est pas précis autour d'un autre point de trim différent de celui autour duquel il a été obtenu.
+Question : quelle région autour de X0 reste pertinente ?
+
+q4
+cf matrices
+Stable : toutes les vp de la matrice d'état sont à partie réelle négative (asymptotiquement car strictement négatif)
+Commandable : Q obtenu avec la forme modale, pas de ligne de zéros donc commandable.
+
+q5
+cf diapo pour l'expression de la fct de transfert. (obtenue grâce à la forme compagne de commande.
+Approximation de Padé : négliger les modes rapides.
+Bonne approximation à long terme. Comparer courbes des réponses indicielles et diag de Bode. 
